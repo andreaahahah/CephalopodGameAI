@@ -205,8 +205,8 @@ def h1(board, player):
     io = 0
     for r in range(len(board.board)):
         for c in range(len(board.board)):
-            if board.board[r][c] == None:
-                break
+            if board.board[r][c] is None:
+                continue
             cell = board.board[r][c]
             giocatore,pip = cell
             if giocatore == player :
