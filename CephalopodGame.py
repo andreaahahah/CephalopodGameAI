@@ -1,3 +1,5 @@
+import os
+
 import tkinter as tk
 from tkinter import simpledialog, messagebox
 from tkinter import ttk
@@ -374,6 +376,7 @@ class CephalopodGUI:
             if move is None:
                 move = random.choice(legal_moves)
                 print(f"Time-out per {current_player}, effettuata mossa casuale {move}\n")
+                os._exit(1) #TODO DA TOGLIERE, E' SOLO PER RENDERMI CONTO AL 100% DEL TIMEOUT
         else:
             self.waiting_for_human = True
             self.human_move = None

@@ -2,8 +2,10 @@ import playingStrategies
 #import random
 #import game
 
-# The moves of player have the form (x,y), where y is the column number and x the row number (starting with 0)
+#E' IL BLU
 
+# The moves of player have the form (x,y), where y is the column number and x the row number (starting with 0)
+#h1_alphabeta_search è quello creato da me con h1
 def playerStrategy (game,state):
     cutOff = 3 # The depth of the search tree. It can be changed to test the performance of the player.
     # The player uses the alphabeta search algorithm to find the best move.
@@ -11,3 +13,4 @@ def playerStrategy (game,state):
   
     return move
 
+#TODO forse è utile aumentare il cutOff quando ci avviciniamo alla fine

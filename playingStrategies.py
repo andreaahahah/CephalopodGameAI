@@ -198,27 +198,58 @@ def h1_alphabeta_search(game, state, cutoff=cutoff_depth(2)):
     return max_value(state, -infinity, +infinity, 0)
 
 def h (board, player):
-    return 0   
+    avversario = 0
+    io = 0
+    size = len(board.board)
+    for r in range(size):
+        for c in range(size):
+            if board.board[r][c] is None:
+                continue
+            cell = board.board[r][c]
+            giocatore, pip = cell
+            if giocatore == player:
+                # allora sto parlando di me
+                io += 1
+                if pip == 6:
+                    io += 3
+            else:
+                avversario += 1
+                if pip == 6:
+                    avversario += 3
+    return io - avversario
  
 def h1(board, player):
     avversario = 0
     io = 0
-    for r in range(len(board.board)):
-        for c in range(len(board.board)):
-            if board.board[r][c] == None:
-                break
+    size = len(board.board)
+    center = size // 2
+
+    for r in range(size):
+        for c in range(size):
+            if board.board[r][c] is None:
+                continue
             cell = board.board[r][c]
-            giocatore,pip = cell
-            if giocatore == player :
-                #allora sto parlando di me
-                io+=1
-                if pip == 6 :
-                    io+=3
-            else:
-                avversario+=1
+            giocatore, pip = cell
+            distance_to_center = max(abs(r - center), abs(c - center))
+
+            if giocatore == player:
+                # allora sto parlando di me
+                io += 1
                 if pip == 6:
-                    avversario+=3
-    return io-avversario
+                    io += 3
+            else:
+                avversario += 1
+                if pip == 6:
+                    avversario += 3
+
+            if distance_to_center == 0:
+                # Cella centrale
+                if giocatore == player:
+                    io += 1
+                else:
+                    avversario += 1
+
+    return io - avversario
 
 #aggiungere il controllo della vulnerabilità dei dadi, e forzare l'euristica sul centro, dando valori più elevati più si è vicini al centro
             
