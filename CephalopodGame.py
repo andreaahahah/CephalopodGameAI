@@ -413,6 +413,8 @@ class CephalopodGUI:
         count_blue = state.count("Blue")
         count_red = state.count("Red")
 
+        first_player = self.game.first_player
+
         winner_message = ""
         if count_blue > count_red:
             winner_message = f"Vince Blue con {count_blue} celle contro {count_red}"
@@ -421,6 +423,7 @@ class CephalopodGUI:
         else:
             winner_message = f"Pareggio! Blue e Red hanno {count_blue} celle ciascuno"
 
+        winner_message += f"\nHa iniziato: {first_player}"
         dialog = tk.Toplevel(self.root)
         dialog.title("Fine partita")
         dialog.geometry("400x200")

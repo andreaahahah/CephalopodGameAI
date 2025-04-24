@@ -1,5 +1,9 @@
 import math
 
+from CephalopodGame import get_subsets
+
+inizio_io = True
+controllato = False
 def minimax_search(game, state):
     """Search game tree to determine best move; return (value, move) pair."""
 
@@ -197,7 +201,7 @@ def h1_alphabeta_search(game, state, cutoff=cutoff_depth(2)):
 
     return max_value(state, -infinity, +infinity, 0)
 
-def h (board, player):
+'''def h (board, player):
     avversario = 0
     io = 0
     size = len(board.board)
@@ -216,8 +220,64 @@ def h (board, player):
                 avversario += 1
                 if pip == 6:
                     avversario += 3
+    return io - avversario'''
+
+
+def h(board, player):
+    avversario = 0
+    io = 0
+    size = len(board.board)
+    center = size // 2
+
+    global controllato
+    if not controllato:
+        chi_inizia(board, player)
+        controllato = True
+
+    for r in range(size):
+        for c in range(size):
+            if board.board[r][c] is None:
+                continue
+            cell = board.board[r][c]
+            giocatore, pip = cell
+            distance_to_center = max(abs(r - center), abs(c - center))
+
+            if giocatore == player:
+                # allora sto parlando di me
+                io += 1
+                io += assess_vulnerability(board, r, c) * -1
+                if pip == 6:
+                    io += 6
+                if pip >= 4:
+                    io += 3
+            else:
+                avversario += 1
+                avversario += assess_vulnerability(board, r, c) * -1
+                if pip == 6:
+                    avversario += 8
+                if pip >= 4:
+                    avversario += 1
+
+            if distance_to_center == 0:
+                # Cella centrale
+                if giocatore == player:
+                    io += 4
+                else:
+                    avversario += 4
+
+            if distance_to_center == 1:
+                # Cella centrale
+                if giocatore == player:
+                    io += 1
+                else:
+                    avversario += 1
+
+            if giocatore != player and pip == 1 and inizio_io:
+                io += 2
+
     return io - avversario
- 
+
+
 def h1(board, player):
     avversario = 0
     io = 0
@@ -235,23 +295,85 @@ def h1(board, player):
             if giocatore == player:
                 # allora sto parlando di me
                 io += 1
+                io += assess_vulnerability(board, r, c) * -1
                 if pip == 6:
-                    io += 3
+                    io += 6
+                if pip >=4:
+                    io+=3
             else:
                 avversario += 1
+                avversario += assess_vulnerability(board, r, c) * -1
                 if pip == 6:
-                    avversario += 3
+                    avversario += 8
+                if pip >=4:
+                    avversario+=1
 
-            if distance_to_center == 0:
+            if distance_to_center == 0 :
+                # Cella centrale
+                if giocatore == player:
+                    io += 4
+                else:
+                    avversario += 4
+
+            if distance_to_center == 1 :
                 # Cella centrale
                 if giocatore == player:
                     io += 1
                 else:
                     avversario += 1
 
+
     return io - avversario
 
+#con questi pesi riesce a vincere con se stesso con i pesi diversi
+def assess_vulnerability(board, r, c):
+    """Valuta quanto è vulnerabile una cella alla cattura"""
+    size = len(board.board)
+    vulnerability = 0
+
+    # Controlla le celle adiacenti vuote
+    for dr, dc in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
+        nr, nc = r + dr, c + dc
+        if 0 <= nr < size and 0 <= nc < size and board.board[nr][nc] is None:
+            # Controlla le altre celle adiacenti a questa cella vuota
+            adjacent_pips = []
+            for dr2, dc2 in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
+                nr2, nc2 = nr + dr2, nc + dc2
+                if 0 <= nr2 < size and 0 <= nc2 < size and board.board[nr2][nc2] is not None:
+                    if (nr2, nc2) != (r, c):  # Non includere la cella che stiamo valutando
+                        adjacent_pips.append(board.board[nr2][nc2][1])
+
+            # Aggiungi il pip della cella corrente
+            current_pip = board.board[r][c][1]
+
+            # Controlla combinazioni di celle che potrebbero portare a cattura
+            for i in range(1, len(adjacent_pips) + 1):
+                for subset in get_subsets(adjacent_pips, i):
+                    total = sum(subset) + current_pip
+                    if 2 <= total <= 6:
+                        vulnerability += 1  # Aumenta vulnerabilità
+
+    return vulnerability
 #aggiungere il controllo della vulnerabilità dei dadi, e forzare l'euristica sul centro, dando valori più elevati più si è vicini al centro
             
 
+def chi_inizia(board, player):
+    avversario = 0
+    io = 0
+    size = len(board.board)
+    for r in range(size):
+        for c in range(size):
+            if board.board[r][c] is None:
+                continue
+            cell = board.board[r][c]
+            giocatore, pip = cell
+            if giocatore == player:
+                io += 1
+            else:
+                avversario += 1
+    if avversario > io:
+        global inizio_io
+        inizio_io = False
+        global controllato
+        controllato = True
 
