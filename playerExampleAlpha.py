@@ -2,18 +2,17 @@ import playingStrategies
 
 
 
+#usiamo un cutoff dinamico
 def playerStrategy(game, state):
     quante = quanteCelle(state)
     if (quante > 20):
         cutOff = 5
     else:
-        if (quante > 15):
+        if (quante > 17):
             cutOff = 4
         else:
-            cutOff = 3  # The depth of the search tree. It can be changed to test the performance of the player.
-    # The player uses the alphabeta search algorithm to find the best move.
+            cutOff = 3
     value, move = playingStrategies.h_alphabeta_search(game, state, playingStrategies.cutoff_depth(cutOff))
-
     return move
 
 

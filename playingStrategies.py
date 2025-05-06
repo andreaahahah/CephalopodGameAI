@@ -160,69 +160,6 @@ def h_alphabeta_search(game, state, cutoff=cutoff_depth(2)):
     return max_value(state, -infinity, +infinity, 0)
 
 
-def h1_alphabeta_search(game, state, cutoff=cutoff_depth(2)):
-    """Search game to determine best action; use alpha-beta pruning.
-    As in [Figure 5.7], this version searches all the way to the leaves."""
-
-    player = state.to_move
-    
-
-    @cache1
-    def max_value(state, alpha, beta, depth):
-        if game.is_terminal(state):
-            return game.utility(state, player), None
-        if cutoff(game, state, depth):
-            return h1(state, player), None
-        v, move = -infinity, None
-        for a in game.actions(state):
-            v2, _ = min_value(game.result(state, a), alpha, beta, depth+1)
-            if v2 > v:
-                v, move = v2, a
-                alpha = max(alpha, v)
-            if v >= beta:
-                return v, move
-        return v, move
-
-    @cache1
-    def min_value(state, alpha, beta, depth):
-        if game.is_terminal(state):
-            return game.utility(state, player), None
-        if cutoff(game, state, depth):
-            return h1(state, player), None
-        v, move = +infinity, None
-        for a in game.actions(state):
-            v2, _ = max_value(game.result(state, a), alpha, beta, depth + 1)
-            if v2 < v:
-                v, move = v2, a
-                beta = min(beta, v)
-            if v <= alpha:
-                return v, move
-        return v, move
-
-    return max_value(state, -infinity, +infinity, 0)
-
-'''def h (board, player):
-    avversario = 0
-    io = 0
-    size = len(board.board)
-    for r in range(size):
-        for c in range(size):
-            if board.board[r][c] is None:
-                continue
-            cell = board.board[r][c]
-            giocatore, pip = cell
-            if giocatore == player:
-                # allora sto parlando di me
-                io += 1
-                if pip == 6:
-                    io += 3
-            else:
-                avversario += 1
-                if pip == 6:
-                    avversario += 3
-    return io - avversario'''
-
-
 def h(board, player):
     avversario = 0
     io = 0
@@ -278,52 +215,6 @@ def h(board, player):
     return io - avversario
 
 
-def h1(board, player):
-    avversario = 0
-    io = 0
-    size = len(board.board)
-    center = size // 2
-
-    for r in range(size):
-        for c in range(size):
-            if board.board[r][c] is None:
-                continue
-            cell = board.board[r][c]
-            giocatore, pip = cell
-            distance_to_center = max(abs(r - center), abs(c - center))
-
-            if giocatore == player:
-                # allora sto parlando di me
-                io += 1
-                io += assess_vulnerability(board, r, c) * -1
-                if pip == 6:
-                    io += 6
-                if pip >=4:
-                    io+=3
-            else:
-                avversario += 1
-                avversario += assess_vulnerability(board, r, c) * -1
-                if pip == 6:
-                    avversario += 8
-                if pip >=4:
-                    avversario+=1
-
-            if distance_to_center == 0 :
-                # Cella centrale
-                if giocatore == player:
-                    io += 4
-                else:
-                    avversario += 4
-
-            if distance_to_center == 1 :
-                # Cella centrale
-                if giocatore == player:
-                    io += 1
-                else:
-                    avversario += 1
-
-
-    return io - avversario
 
 #con questi pesi riesce a vincere con se stesso con i pesi diversi
 def assess_vulnerability(board, r, c):
@@ -340,7 +231,7 @@ def assess_vulnerability(board, r, c):
             for dr2, dc2 in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
                 nr2, nc2 = nr + dr2, nc + dc2
                 if 0 <= nr2 < size and 0 <= nc2 < size and board.board[nr2][nc2] is not None:
-                    if (nr2, nc2) != (r, c):  # Non includere la cella che stiamo valutando
+                    if (nr2, nc2) != (r, c):
                         adjacent_pips.append(board.board[nr2][nc2][1])
 
             # Aggiungi il pip della cella corrente
@@ -354,8 +245,7 @@ def assess_vulnerability(board, r, c):
                         vulnerability += 1  # Aumenta vulnerabilità
 
     return vulnerability
-#aggiungere il controllo della vulnerabilità dei dadi, e forzare l'euristica sul centro, dando valori più elevati più si è vicini al centro
-            
+
 
 def chi_inizia(board, player):
     avversario = 0
